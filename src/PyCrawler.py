@@ -2,20 +2,59 @@ __author__ = 'Nick'
 
 from urllib2 import *
 from LinkParser import LinkParser
+from argparse import *
+from re import *
 
-def main():
-    parser = LinkParser()
-    parser.feed('<a href="www.google.com">Data</a>')
-    parser.feed('<a  href = "www.facebook.com"></a>')
-    parser.close()
-    for url in parser.get_links():
-        open_url('http://' + url)
+class PyCrawler():
 
-def crawl(seed):
+    def __init__(self, seed, filetypes=['html'], wait=5):
+        self.seed = str(seed)
+        self.parser = LinkParser()
+        self.regex = re.compile(build_regex(filetypes))
+        self.wait = wait
 
+    def crawl(self):
+        seen = set([])
+        def breadth_first(url):
+            url = pad_url(url)
+            if url in seen:
+                return
+            else:
+                html = open_url(url)
+                self.parser.feed(html)
+                links = self.parser.get_links()
+                print map(lambda s: url+'/'+s, links)
+        breadth_first(self.seed)
+        return seen
 
 def open_url(url):
     request = urlopen(url)
-    print request.readlines()
+    return ''.join(request.readlines())
+
+def regex(file):
+    match = re.search(".(pdf|html)$", file)
+    if match:
+        print file
+
+def pad_url(url):
+    if re.match('http://',url):
+        return url
+    else:
+        return 'http://'+url
+
+def build_regex(filetypes):
+    s = r'.('
+    for f in filetypes:
+        s += f + '|'
+    s = s[:-1]
+    s += ')$'
+    return s
+
+def main():
+    pc = PyCrawler('ciir.cs.umass.edu')
+    pc.crawl()
+
+
+
 
 main()
