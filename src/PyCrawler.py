@@ -7,11 +7,12 @@ from argparse import *
 from re import *
 from robotparser import *
 from urlparse import *
+from time import sleep
 
 
 class PyCrawler():
 
-    def __init__(self, seed, filetypes=['html'], wait=5000, limit=10):
+    def __init__(self, seed, filetypes=['html'], wait=1, limit=10):
         self.seed = str(seed)
         self.parser = LinkParser()
         self.regex = build_filetype_regex(filetypes)
@@ -21,32 +22,28 @@ class PyCrawler():
 
     def crawl(self):
         seen = []
-        print 'seen: %s' % seen
-        print type(seen)
         frontier = [self.seed]
         while len(frontier) > 0 and seen.__len__() < self.limit:
+            sleep(self.wait)
             url = frontier.pop(0)
-            self.robot_parser.set_url(url)
+            self.robot_parser.set_url(get_robots_url(url))
             if url not in seen and self.robot_parser.can_fetch('*', url):
                 print 'crawling %s' % url
-                host, html = read_html(url)
+                html = read_html(url)
                 self.parser.feed(html)
                 links = self.parser.get_links()
                 http_links = [resolve_relative_path(url, x) for x in links if self.regex.search(x)]
-                print http_links
                 for link in http_links:
                     if link not in frontier:
                         frontier.append(link)
                 seen.append(url)
-        print 'seen: %s' % seen
         return seen
 
 
 def read_html(url):
     request = Request(url)
     html = ''.join(urlopen(request).readlines())
-    host = request.get_host()
-    return host, html
+    return html
 
 
 def pad_url(url, host):
@@ -87,9 +84,6 @@ def main():
     pc = PyCrawler('http://ciir.cs.umass.edu/about')
     links = pc.crawl()
     print links
-    print links.__len__()
-
-
 
 
 main()
