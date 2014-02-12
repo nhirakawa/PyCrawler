@@ -31,11 +31,14 @@ class PyCrawler():
             if url not in seen and self.robot_parser.can_fetch('*', url):
                 print 'crawling %s' % url
                 html = read_html(url)
+                if not html:
+                    print 'Bad URL was found'
+                    continue
                 self.parser.feed(html)
                 links = self.parser.get_links()
                 http_links = [resolve_relative_path(url, x) for x in links if self.file_regex.search(x)]
                 for link in http_links:
-                    if link not in frontier and self.domain_regex.search('link'):
+                    if link not in frontier and self.domain_regex.search(link):
                         frontier.append(link)
                 seen.append(url)
         return seen
@@ -43,8 +46,12 @@ class PyCrawler():
 
 def read_html(url):
     request = Request(url)
-    html = ''.join(urlopen(request).readlines())
-    return html
+    try:
+        html = ''.join(urlopen(request).readlines())
+        return html
+    except URLError:
+        print 'URL: %s\t is unavailable' % url
+        return None
 
 
 def pad_url(url, host):
@@ -79,7 +86,7 @@ def build_filetype_regex(filetypes):
 
 
 def main():
-    pc = PyCrawler('http://ciir.cs.umass.edu/about', limit=30, wait=0)
+    pc = PyCrawler('http://ciir.cs.umass.edu/about', limit=100, wait=1, domain='cs.umass.edu')
     links = pc.crawl()
     print links
 
