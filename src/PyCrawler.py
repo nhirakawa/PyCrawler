@@ -62,14 +62,6 @@ def get_robots_url(url):
 def resolve_relative_path(host, url):
     print 'url: %s' % url
     print 'host: %s' % host
-    if re.match('../', url):
-        if re.search('html$', host):
-            print urljoin(host, url)
-            return urljoin(host, url)
-        else:
-            result = urljoin(host+'/', url)
-            print result
-            return result
     if not re.search('html$', host):
         host += '/'
     result = urljoin(host, url)
