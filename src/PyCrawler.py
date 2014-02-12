@@ -12,10 +12,11 @@ from time import sleep
 
 class PyCrawler():
 
-    def __init__(self, seed, filetypes=['html'], wait=1, limit=10):
+    def __init__(self, seed, domain='', filetypes=['html'], wait=1, limit=10):
         self.seed = str(seed)
         self.parser = LinkParser()
-        self.regex = build_filetype_regex(filetypes)
+        self.file_regex = build_filetype_regex(filetypes)
+        self.domain_regex = re.compile(domain)
         self.wait = wait
         self.robot_parser = RobotFileParser()
         self.limit = limit
@@ -23,7 +24,7 @@ class PyCrawler():
     def crawl(self):
         seen = []
         frontier = [self.seed]
-        while len(frontier) > 0 and seen.__len__() < self.limit:
+        while len(frontier) > 0 and len(seen) < self.limit:
             sleep(self.wait)
             url = frontier.pop(0)
             self.robot_parser.set_url(get_robots_url(url))
@@ -32,9 +33,9 @@ class PyCrawler():
                 html = read_html(url)
                 self.parser.feed(html)
                 links = self.parser.get_links()
-                http_links = [resolve_relative_path(url, x) for x in links if self.regex.search(x)]
+                http_links = [resolve_relative_path(url, x) for x in links if self.file_regex.search(x)]
                 for link in http_links:
-                    if link not in frontier:
+                    if link not in frontier and self.domain_regex.search('link'):
                         frontier.append(link)
                 seen.append(url)
         return seen
@@ -55,15 +56,20 @@ def pad_url(url, host):
 
 def get_robots_url(url):
     host = urlparse(url).netloc
-    return host + '/robots.txt'
+    return 'http://' + host + '/robots.txt'
 
 
 def resolve_relative_path(host, url):
     print 'url: %s' % url
     print 'host: %s' % host
     if re.match('../', url):
-        result = urljoin(host, url[2:])
-        return result
+        if re.search('html$', host):
+            print urljoin(host, url)
+            return urljoin(host, url)
+        else:
+            result = urljoin(host+'/', url)
+            print result
+            return result
     if not re.search('html$', host):
         host += '/'
     result = urljoin(host, url)
@@ -81,7 +87,7 @@ def build_filetype_regex(filetypes):
 
 
 def main():
-    pc = PyCrawler('http://ciir.cs.umass.edu/about')
+    pc = PyCrawler('http://ciir.cs.umass.edu/about', limit=30, wait=0)
     links = pc.crawl()
     print links
 
