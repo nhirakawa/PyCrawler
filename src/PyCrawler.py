@@ -54,12 +54,6 @@ def read_html(url):
         return None
 
 
-def pad_url(url, host):
-    if re.match("http://", url):
-        return url
-    else:
-        return host + '/' + url
-
 
 def get_robots_url(url):
     host = urlparse(url).netloc
