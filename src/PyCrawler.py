@@ -41,7 +41,7 @@ class PyCrawler():
                     if link not in frontier and self.domain_regex.search(link):
                         frontier.append(link)
                 for link in file_links:
-                    if self.domain_regex.search(link) and len(seen) < self.limit:
+                    if self.domain_regex.search(link) and len(seen) < self.limit-1:
                         seen.append(link)
                 seen.append(url)
         return seen
@@ -64,7 +64,7 @@ def get_robots_url(url):
 
 
 def resolve_relative_path(host, url):
-    if not re.search('html$', host):
+    if not search('(html|/)$', host):
         host += '/'
     result = urljoin(host, url)
     return result
