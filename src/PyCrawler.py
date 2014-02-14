@@ -7,6 +7,7 @@ from urlparse import *
 from time import sleep
 from HTMLParser import HTMLParser
 
+
 class LinkParser(HTMLParser):
 
     def __init__(self):
