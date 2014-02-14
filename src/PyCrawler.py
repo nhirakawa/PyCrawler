@@ -10,7 +10,7 @@ from time import sleep
 
 class PyCrawler():
 
-    def __init__(self, seed, domain='', filetypes=[], wait=1, limit=10):
+    def __init__(self, seed, domain='', filetypes=['html'], wait=1, limit=10):
         self.seed = str(seed)
         self.parser = LinkParser()
         self.file_regex = build_filetype_regex(filetypes)
