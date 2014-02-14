@@ -76,7 +76,6 @@ def read_html(url):
         return None
 
 
-
 def get_robots_url(url):
     host = urlparse(url).netloc
     return 'http://' + host + '/robots.txt'
@@ -109,7 +108,7 @@ def main():
     pc = PyCrawler('http://ciir.cs.umass.edu/', filetypes=['pdf'], limit=100, wait=0, domain='cs.umass.edu')
     links = pc.crawl()
     print len(links)
-    write_links('links', links)
+    write_links('../results.txt', links)
 
 
 main()
