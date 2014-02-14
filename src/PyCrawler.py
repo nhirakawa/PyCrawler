@@ -10,10 +10,11 @@ from time import sleep
 
 class PyCrawler():
 
-    def __init__(self, seed, domain='', filetypes=['html'], wait=1, limit=10):
+    def __init__(self, seed, domain='', filetypes=[''], wait=1, limit=10):
         self.seed = str(seed)
         self.parser = LinkParser()
         self.file_regex = build_filetype_regex(filetypes)
+        self.html_regex = build_filetype_regex(['html', '/'])
         self.domain_regex = compile(domain)
         self.wait = wait
         self.robot_parser = RobotFileParser()
@@ -34,10 +35,14 @@ class PyCrawler():
                     continue
                 self.parser.feed(html)
                 links = self.parser.get_links()
-                http_links = [resolve_relative_path(url, x) for x in links if self.file_regex.search(x)]
+                http_links = [resolve_relative_path(url, x) for x in links if self.html_regex.search(x)]
+                file_links = [resolve_relative_path(url, x) for x in links if self.file_regex.search(x)]
                 for link in http_links:
                     if link not in frontier and self.domain_regex.search(link):
                         frontier.append(link)
+                for link in file_links:
+                    if self.domain_regex.search(link) and len(seen) < self.limit:
+                        seen.append(link)
                 seen.append(url)
         return seen
 
@@ -82,8 +87,9 @@ def write_links(filename, links):
 
 
 def main():
-    pc = PyCrawler('http://ciir.cs.umass.edu/about', limit=100, wait=1, domain='cs.umass.edu')
+    pc = PyCrawler('http://ciir.cs.umass.edu/', filetypes=['pdf'], limit=100, wait=0, domain='cs.umass.edu')
     links = pc.crawl()
+    print len(links)
     write_links('links', links)
 
 
