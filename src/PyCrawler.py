@@ -1,9 +1,7 @@
 __author__ = 'Nick'
 
-from urllib import *
 from urllib2 import *
 from LinkParser import LinkParser
-from argparse import *
 from re import *
 from robotparser import *
 from urlparse import *
@@ -12,11 +10,11 @@ from time import sleep
 
 class PyCrawler():
 
-    def __init__(self, seed, domain='', filetypes=['html'], wait=1, limit=10):
+    def __init__(self, seed, domain='', filetypes=[], wait=1, limit=10):
         self.seed = str(seed)
         self.parser = LinkParser()
         self.file_regex = build_filetype_regex(filetypes)
-        self.domain_regex = re.compile(domain)
+        self.domain_regex = compile(domain)
         self.wait = wait
         self.robot_parser = RobotFileParser()
         self.limit = limit
@@ -61,12 +59,9 @@ def get_robots_url(url):
 
 
 def resolve_relative_path(host, url):
-    print 'url: %s' % url
-    print 'host: %s' % host
     if not re.search('html$', host):
         host += '/'
     result = urljoin(host, url)
-    print result
     return result
 
 
@@ -76,13 +71,20 @@ def build_filetype_regex(filetypes):
         s += f + '|'
     s = s[:-1]
     s += ')$'
-    return re.compile(s)
+    return compile(s)
+
+
+def write_links(filename, links):
+    with open(filename, 'w') as f:
+        for link in links:
+            f.write(link)
+            f.write('\n')
 
 
 def main():
     pc = PyCrawler('http://ciir.cs.umass.edu/about', limit=100, wait=1, domain='cs.umass.edu')
     links = pc.crawl()
-    print links
+    write_links('links', links)
 
 
 main()
