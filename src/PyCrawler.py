@@ -99,6 +99,7 @@ def build_filetype_regex(filetypes):
 
 
 def write_links(filename, links):
+    links.sort()
     with open(filename, 'w') as f:
         for link in links:
             f.write(link)
@@ -106,7 +107,7 @@ def write_links(filename, links):
 
 
 def main():
-    pc = PyCrawler('http://ciir.cs.umass.edu/', filetypes=['pdf'], limit=100, wait=0, domain='cs.umass.edu')
+    pc = PyCrawler('http://ciir.cs.umass.edu/', filetypes=['pdf'], limit=100, wait=5, domain='cs.umass.edu')
     links = pc.crawl()
     print len(links)
     write_links('../results.txt', links)
