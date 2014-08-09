@@ -14,7 +14,10 @@ How to Run
 Command Line Arguments
 ======================
 
-- `-s, --source`  The URL to start at
-- `-l, --limit`   Limit the number of URL's crawled
-- `-w, --wait`    Time, in seconds, to wait between requests
-- `-d, --domain`  Limit URL's crawled to domain
+`-s, --source`  The URL to start at
+
+`-l, --limit`   Limit the number of URL's crawled
+
+`-w, --wait`    Time, in seconds, to wait between requests
+
+`-d, --domain`  Limit URL's crawled to domain
