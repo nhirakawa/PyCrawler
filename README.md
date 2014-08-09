@@ -1,15 +1,15 @@
 PyCrawler
 =========
 
-A web crawler written in python (requires python 2.7)
-Collects HTML and PDF files only
-Always obeys robots.txt policies
+- A web crawler written in python (requires python 2.7)
+- Collects HTML and PDF files only
+- Always obeys robots.txt policies
 
 How to Run
 ==========
 
-To run, simply run `$ python PyCrawler.py`
-Results are placed in the current directory in the file `results.txt`
+- To run, simply run `$ python PyCrawler.py`
+- Results are placed in the current directory in the file `results.txt`
 
 Command Line Arguments
 ======================
